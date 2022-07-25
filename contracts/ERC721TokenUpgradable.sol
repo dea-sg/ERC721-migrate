@@ -19,8 +19,7 @@ contract ERC721TokenUpgradable is
 	//基数設定
 	uint256 private constant ASSET_ID_CARDINAL_NUMBER =
 		10**uint256(SERIAL_ID_DECIMAL);
-	uint256 private constant SERIAL_ID_UPPER_LIMIT =
-		(10**uint256(SERIAL_ID_DECIMAL)) - 1;
+	uint256 public serialIdUpperLimit = (10**uint256(SERIAL_ID_DECIMAL)) - 1;
 	mapping(uint256 => string) private _tokenURIs;
 	// 互換のため、命名規則は無視
 	// solhint-disable-next-line var-name-mixedcase
@@ -32,6 +31,7 @@ contract ERC721TokenUpgradable is
 		__UUPSUpgradeable_init();
 		__ERC721_init("Digital Art", "DAT");
 		__AccessControlEnumerable_init();
+		_setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
 		_setupRole(MINTER_ROLE, _msgSender());
 	}
 
@@ -56,6 +56,25 @@ contract ERC721TokenUpgradable is
 	 */
 	function totalSupply() public view returns (uint256) {
 		return tokenList.length;
+	}
+
+	function tokenURI(uint256 _tokenId)
+		public
+		view
+		virtual
+		override
+		returns (string memory)
+	{
+		_requireMinted(_tokenId);
+		string memory tokenURI_ = _tokenURIs[_tokenId];
+
+		// Even if there is a base URI, it is only appended to non-empty token-specific URIs
+		if (bytes(tokenURI_).length == 0) {
+			return "";
+		} else {
+			// abi.encodePacked is being used to concatenate strings
+			return string(abi.encodePacked(_baseURI(), tokenURI_));
+		}
 	}
 
 	/**
@@ -239,7 +258,7 @@ contract ERC721TokenUpgradable is
 		//total number of serial id validation
 		// solhint-disable-next-line reason-string
 		require(
-			_total + assetData.totalNumberOfSerialId <= SERIAL_ID_UPPER_LIMIT,
+			_total + assetData.totalNumberOfSerialId <= serialIdUpperLimit,
 			"the total number of serial ids is out of bounds"
 		);
 
@@ -275,25 +294,6 @@ contract ERC721TokenUpgradable is
 		_tokenURIs[_tokenId] = _tokenURI;
 	}
 
-	function tokenURI(uint256 _tokenId)
-		public
-		view
-		virtual
-		override
-		returns (string memory)
-	{
-		_requireMinted(_tokenId);
-		string memory tokenURI_ = _tokenURIs[_tokenId];
-
-		// Even if there is a base URI, it is only appended to non-empty token-specific URIs
-		if (bytes(tokenURI_).length == 0) {
-			return "";
-		} else {
-			// abi.encodePacked is being used to concatenate strings
-			return string(abi.encodePacked(_baseURI(), tokenURI_));
-		}
-	}
-
 	function mintWithTokenURI(
 		address _to,
 		uint256 _tokenId,
@@ -304,6 +304,14 @@ contract ERC721TokenUpgradable is
 		return true;
 	}
 
+	// for test
+	function setSerialIdUpperLimit(uint256 _serialIdUpperLimit)
+		external
+		onlyRole(DEFAULT_ADMIN_ROLE)
+	{
+		serialIdUpperLimit = _serialIdUpperLimit;
+	}
+
 	function _authorizeUpgrade(address)
 		internal
 		override
@@ -312,14 +320,11 @@ contract ERC721TokenUpgradable is
 }
 
 // TODO コメントつける
-// testする
-// supportsInterfaceに自分のinterface追加する
 // bulkMint実行時の引数情報とかわかる？
 //    _total引数の問題で、token_listのデータがいまいちわからない。
 //    もしmintデータの時系列がもらえるのであれば、問題はないのだが
 // AssetDataはasset_idとついでほしい
 // burnはされていた形跡がない、その認識であっていますか？
-// 単体テスト
 // importのスクリプト
 // デプロイのスクリプト
 // importの関数とそのテスト
