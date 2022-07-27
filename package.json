@@ -55,7 +55,7 @@
 		"@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
 		"@nomicfoundation/hardhat-network-helpers": "^1.0.2",
 		"@openzeppelin/contracts": "4.7.2",
-		"@openzeppelin/contracts-upgradeable": "4.7.1",
+		"@openzeppelin/contracts-upgradeable": "4.7.2",
 		"hardhat-gas-reporter": "^1.0.8",
 		"solidity-coverage": "^0.7.21"
 	}
