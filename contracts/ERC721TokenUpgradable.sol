@@ -298,7 +298,7 @@ contract ERC721TokenUpgradable is
 		address _to,
 		uint256 _tokenId,
 		string memory _tokenURI
-	) public onlyRole(MINTER_ROLE) returns (bool) {
+	) private onlyRole(MINTER_ROLE) returns (bool) {
 		_mint(_to, _tokenId);
 		_setTokenURI(_tokenId, _tokenURI);
 		return true;
@@ -317,15 +317,44 @@ contract ERC721TokenUpgradable is
 		override
 		onlyRole(DEFAULT_ADMIN_ROLE)
 	{}
+
+	// import function
+	function setTokenIds(uint256[] memory _tokenIdList)
+		external
+		onlyRole(DEFAULT_ADMIN_ROLE)
+	{
+		for (uint256 index = 0; index < _tokenIdList.length; index++) {
+			tokenList.push(_tokenIdList[index]);
+		}
+	}
+
+	// import function
+	function setAssetData(
+		uint256[] memory _assetIds,
+		uint256[] memory _totalNumberOfSerialIds,
+		string[] memory _assetNames,
+		string[] memory _uris
+	) external onlyRole(DEFAULT_ADMIN_ROLE) {
+		for (uint256 index = 0; index < _assetIds.length; index++) {
+			asset_info[_assetIds[index]] = AssetData(
+				_totalNumberOfSerialIds[index],
+				_assetNames[index],
+				_uris[index]
+			);
+		}
+	}
+
+	// import function
+	function setNftData(
+		string[] memory _uris,
+		uint256[] memory _tokenIds,
+		address[] memory _owners
+	) external onlyRole(DEFAULT_ADMIN_ROLE) {
+		for (uint256 index = 0; index < _tokenIds.length; index++) {
+			_mint(_owners[index], _tokenIds[index]);
+			_tokenURIs[_tokenIds[index]] = _uris[index];
+		}
+	}
 }
 
-// TODO コメントつける
-// bulkMint実行時の引数情報とかわかる？
-//    _total引数の問題で、token_listのデータがいまいちわからない。
-//    もしmintデータの時系列がもらえるのであれば、問題はないのだが
-// AssetDataはasset_idとついでほしい
-// burnはされていた形跡がない、その認識であっていますか？
 // importのスクリプト
-// デプロイのスクリプト
-// importの関数とそのテスト
-// mintWithTokenURI、時効されてなければプライベートで

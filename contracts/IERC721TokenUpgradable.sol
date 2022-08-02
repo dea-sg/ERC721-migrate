@@ -40,10 +40,4 @@ interface IERC721TokenUpgradable {
 		string calldata _tokenUri,
 		uint256 _total
 	) external returns (bool);
-
-	function mintWithTokenURI(
-		address _to,
-		uint256 _tokenId,
-		string memory _tokenURI
-	) external returns (bool);
 }

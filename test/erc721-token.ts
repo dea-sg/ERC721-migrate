@@ -23,6 +23,14 @@ describe('ERC721Token', () => {
 	afterEach(async () => {
 		await snapshot.restore()
 	})
+
+	const checkDefaultAssetData = async (assetId: number): Promise<void> => {
+		const assetData = await token.getAssetData(assetId)
+		expect(assetData.total_number).to.equal(0)
+		expect(assetData.asset_name).to.equal('')
+		expect(assetData.uri).to.equal('')
+	}
+
 	describe('name', () => {
 		it('check name', async () => {
 			const name = await token.name()
@@ -223,30 +231,25 @@ describe('ERC721Token', () => {
 		})
 	})
 	describe('getAssetData', () => {
-		describe('success', () => {
-			it('not minted', async () => {
-				const assetData = await token.getAssetData(100001)
-				expect(assetData.total_number).to.equal(0)
-				expect(assetData.asset_name).to.equal('')
-				expect(assetData.uri).to.equal('')
-			})
-			it('1 minted', async () => {
-				const user = Wallet.createRandom()
-				await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
-				const assetData = await token.getAssetData(1)
-				expect(assetData.total_number).to.equal(1)
-				expect(assetData.asset_name).to.equal('test name')
-				expect(assetData.uri).to.equal('test uri')
-			})
-			it('2 minted', async () => {
-				const user = Wallet.createRandom()
-				await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
-				await token.bulkMint(user.address, 2, 'test name2', 'test uri2', 2)
-				const assetData = await token.getAssetData(2)
-				expect(assetData.total_number).to.equal(2)
-				expect(assetData.asset_name).to.equal('test name2')
-				expect(assetData.uri).to.equal('test uri2')
-			})
+		it('not minted', async () => {
+			await checkDefaultAssetData(100001)
+		})
+		it('1 minted', async () => {
+			const user = Wallet.createRandom()
+			await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
+			const assetData = await token.getAssetData(1)
+			expect(assetData.total_number).to.equal(1)
+			expect(assetData.asset_name).to.equal('test name')
+			expect(assetData.uri).to.equal('test uri')
+		})
+		it('2 minted', async () => {
+			const user = Wallet.createRandom()
+			await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
+			await token.bulkMint(user.address, 2, 'test name2', 'test uri2', 2)
+			const assetData = await token.getAssetData(2)
+			expect(assetData.total_number).to.equal(2)
+			expect(assetData.asset_name).to.equal('test name2')
+			expect(assetData.uri).to.equal('test uri2')
 		})
 	})
 
@@ -374,6 +377,174 @@ describe('ERC721Token', () => {
 				await expect(
 					token.bulkMint(user.address, 1, 'token-name', 'toke uri', 1)
 				).to.be.revertedWith('the total number of serial ids is out of bounds')
+			})
+		})
+	})
+	describe('setTokenIds', () => {
+		describe('success', () => {
+			it('set id list', async () => {
+				const beforeTotalSupply = await token.totalSupply()
+				expect(beforeTotalSupply).to.deep.equal(0)
+				await token.setTokenIds([100001, 200010])
+				await token.setTokenIds([300001, 400010])
+				const afterTotalSupply = await token.totalSupply()
+				expect(afterTotalSupply).to.deep.equal(4)
+				const tokenId1 = await token.getTokenId(0)
+				expect(tokenId1).to.deep.equal(100001)
+				const tokenId2 = await token.getTokenId(1)
+				expect(tokenId2).to.deep.equal(200010)
+				const tokenId3 = await token.getTokenId(2)
+				expect(tokenId3).to.deep.equal(300001)
+				const tokenId4 = await token.getTokenId(3)
+				expect(tokenId4).to.deep.equal(400010)
+			})
+		})
+		describe('fail', () => {
+			it('not owner', async () => {
+				const account = await ethers.getSigners()
+				const adminRole = await token.DEFAULT_ADMIN_ROLE()
+				const sender = account[2]
+				const msg = `AccessControl: account ${sender.address.toLowerCase()} is missing role ${adminRole}`
+				await expect(
+					token.connect(sender).setTokenIds([0, 1])
+				).to.be.revertedWith(msg)
+			})
+		})
+	})
+	describe('setAssetData', () => {
+		describe('success', () => {
+			it('set id list', async () => {
+				await checkDefaultAssetData(1)
+				await checkDefaultAssetData(2)
+				await checkDefaultAssetData(3)
+				await checkDefaultAssetData(4)
+
+				await token.setAssetData(
+					[1, 2],
+					[10, 20],
+					['name1', 'name2'],
+					['uri1', 'uri2']
+				)
+				await token.setAssetData(
+					[3, 4],
+					[30, 40],
+					['name3', 'name4'],
+					['uri3', 'uri4']
+				)
+
+				const assetData1 = await token.getAssetData(1)
+				expect(assetData1.total_number).to.deep.equal(10)
+				expect(assetData1.asset_name).to.deep.equal('name1')
+				expect(assetData1.uri).to.deep.equal('uri1')
+
+				const assetData2 = await token.getAssetData(2)
+				expect(assetData2.total_number).to.deep.equal(20)
+				expect(assetData2.asset_name).to.deep.equal('name2')
+				expect(assetData2.uri).to.deep.equal('uri2')
+
+				const assetData3 = await token.getAssetData(3)
+				expect(assetData3.total_number).to.deep.equal(30)
+				expect(assetData3.asset_name).to.deep.equal('name3')
+				expect(assetData3.uri).to.deep.equal('uri3')
+
+				const assetData4 = await token.getAssetData(4)
+				expect(assetData4.total_number).to.deep.equal(40)
+				expect(assetData4.asset_name).to.deep.equal('name4')
+				expect(assetData4.uri).to.deep.equal('uri4')
+			})
+		})
+		describe('fail', () => {
+			it('not owner', async () => {
+				const account = await ethers.getSigners()
+				const adminRole = await token.DEFAULT_ADMIN_ROLE()
+				const sender = account[2]
+				const msg = `AccessControl: account ${sender.address.toLowerCase()} is missing role ${adminRole}`
+				await expect(
+					token
+						.connect(sender)
+						.setAssetData(
+							[1, 2],
+							[10, 20],
+							['name1', 'name2'],
+							['uri1', 'uri2']
+						)
+				).to.be.revertedWith(msg)
+			})
+		})
+	})
+	describe('setNftData', () => {
+		describe('success', () => {
+			it('set id list', async () => {
+				const user1 = Wallet.createRandom()
+				const user2 = Wallet.createRandom()
+				const user3 = Wallet.createRandom()
+				const user4 = Wallet.createRandom()
+
+				const beforeBalance1 = await token.balanceOf(user1.address)
+				expect(beforeBalance1).to.deep.equal(0)
+				const beforeBalance2 = await token.balanceOf(user2.address)
+				expect(beforeBalance2).to.deep.equal(0)
+				const beforeBalance3 = await token.balanceOf(user3.address)
+				expect(beforeBalance3).to.deep.equal(0)
+				const beforeBalance4 = await token.balanceOf(user4.address)
+				expect(beforeBalance4).to.deep.equal(0)
+
+				await token.setNftData(
+					['uri1', 'uri2'],
+					[1, 2],
+					[user1.address, user2.address]
+				)
+				await token.setNftData(
+					['uri3', 'uri4'],
+					[3, 4],
+					[user3.address, user4.address]
+				)
+
+				const afterBalance1 = await token.balanceOf(user1.address)
+				expect(afterBalance1).to.deep.equal(1)
+				const afterBalance2 = await token.balanceOf(user2.address)
+				expect(afterBalance2).to.deep.equal(1)
+				const afterBalance3 = await token.balanceOf(user3.address)
+				expect(afterBalance3).to.deep.equal(1)
+				const afterBalance4 = await token.balanceOf(user4.address)
+				expect(afterBalance4).to.deep.equal(1)
+
+				const owner1 = await token.ownerOf(1)
+				expect(owner1).to.deep.equal(user1.address)
+				const owner2 = await token.ownerOf(2)
+				expect(owner2).to.deep.equal(user2.address)
+				const owner3 = await token.ownerOf(3)
+				expect(owner3).to.deep.equal(user3.address)
+				const owner4 = await token.ownerOf(4)
+				expect(owner4).to.deep.equal(user4.address)
+
+				const uri1 = await token.tokenURI(1)
+				expect(uri1).to.deep.equal('uri1')
+				const uri2 = await token.tokenURI(2)
+				expect(uri2).to.deep.equal('uri2')
+				const uri3 = await token.tokenURI(3)
+				expect(uri3).to.deep.equal('uri3')
+				const uri4 = await token.tokenURI(4)
+				expect(uri4).to.deep.equal('uri4')
+			})
+		})
+		describe('fail', () => {
+			it('not owner', async () => {
+				const user1 = Wallet.createRandom()
+				const user2 = Wallet.createRandom()
+				const account = await ethers.getSigners()
+				const adminRole = await token.DEFAULT_ADMIN_ROLE()
+				const sender = account[2]
+				const msg = `AccessControl: account ${sender.address.toLowerCase()} is missing role ${adminRole}`
+				await expect(
+					token
+						.connect(sender)
+						.setNftData(
+							['uri1', 'uri2'],
+							[100001, 200001],
+							[user1.address, user2.address]
+						)
+				).to.be.revertedWith(msg)
 			})
 		})
 	})
