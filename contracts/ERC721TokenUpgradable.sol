@@ -14,6 +14,7 @@ contract ERC721TokenUpgradable is
 	IERC721TokenUpgradable
 {
 	bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+	string private constant DUMMY_URI = "https://dea";
 	//桁設定
 	uint256 private constant SERIAL_ID_DECIMAL = 5;
 	//基数設定
@@ -319,42 +320,40 @@ contract ERC721TokenUpgradable is
 	{}
 
 	// import function
-	function setTokenIds(uint256[] memory _tokenIdList)
+	// function setAssetData(
+	// 	uint256[] memory _assetIds,
+	// 	uint256[] memory _totalNumberOfSerialIds,
+	// 	string[] memory _assetNames
+	// ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+	// 	for (uint256 index = 0; index < _assetIds.length; index++) {
+	// 		asset_info[_assetIds[index]] = AssetData(
+	// 			_totalNumberOfSerialIds[index],
+	// 			_assetNames[index],
+	// 			DUMMY_URI
+	// 		);
+	// 	}
+	// }
+	function setAssetData(
+		uint256[] memory _assetIds,
+		AssetData[] memory _assetDataList
+	) external onlyRole(DEFAULT_ADMIN_ROLE) {
+		require(_assetIds.length == _assetDataList.length, "illegal data");
+		for (uint256 index = 0; index < _assetIds.length; index++) {
+			AssetData memory tmp = _assetDataList[index];
+			tmp.uri = DUMMY_URI;
+			asset_info[_assetIds[index]] = tmp;
+		}
+	}
+
+	function setNftData(TokenOwner[] memory _tokenOwners)
 		external
 		onlyRole(DEFAULT_ADMIN_ROLE)
 	{
-		for (uint256 index = 0; index < _tokenIdList.length; index++) {
-			tokenList.push(_tokenIdList[index]);
-		}
-	}
-
-	// import function
-	function setAssetData(
-		uint256[] memory _assetIds,
-		uint256[] memory _totalNumberOfSerialIds,
-		string[] memory _assetNames,
-		string[] memory _uris
-	) external onlyRole(DEFAULT_ADMIN_ROLE) {
-		for (uint256 index = 0; index < _assetIds.length; index++) {
-			asset_info[_assetIds[index]] = AssetData(
-				_totalNumberOfSerialIds[index],
-				_assetNames[index],
-				_uris[index]
-			);
-		}
-	}
-
-	// import function
-	function setNftData(
-		string[] memory _uris,
-		uint256[] memory _tokenIds,
-		address[] memory _owners
-	) external onlyRole(DEFAULT_ADMIN_ROLE) {
-		for (uint256 index = 0; index < _tokenIds.length; index++) {
-			_mint(_owners[index], _tokenIds[index]);
-			_tokenURIs[_tokenIds[index]] = _uris[index];
+		for (uint256 index = 0; index < _tokenOwners.length; index++) {
+			TokenOwner memory tmp = _tokenOwners[index];
+			_mint(tmp.owner, tmp.tokenId);
+			_tokenURIs[tmp.tokenId] = DUMMY_URI;
+			tokenList.push(tmp.tokenId);
 		}
 	}
 }
-
-// importのスクリプト

@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import { ethers } from 'hardhat'
 import { abi } from './../artifacts/contracts/ERC721TokenUpgradable.sol/ERC721TokenUpgradable.json'
@@ -23,15 +24,15 @@ async function main() {
 		tmpData.push(data)
 		if (tmpData.length === 10000) {
 			for (const tmp of tmpData) {
-				const tokenIds = []
-				const owners = []
+				const args = []
 				for (const d of tmp) {
-					tokenIds.push(d.tokenId)
-					owners.push(d.owner)
+					args.push({
+						tokenId: d.tokenId,
+						owner: d.owner,
+					})
 				}
 
-				await token.setNftData(tokenIds, owners)
-				await token.setTokenIds(tokenIds)
+				await token.setNftData(args)
 			}
 
 			tmpData.splice(0)

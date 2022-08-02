@@ -10,6 +10,11 @@ interface IERC721TokenUpgradable {
 		string uri;
 	}
 
+	struct TokenOwner {
+		uint256 tokenId;
+		address owner;
+	}
+
 	function getTokenId(uint256 _index) external view returns (uint256);
 
 	function getTokenList(uint256 _start, uint256 _end)

@@ -380,37 +380,6 @@ describe('ERC721Token', () => {
 			})
 		})
 	})
-	describe('setTokenIds', () => {
-		describe('success', () => {
-			it('set id list', async () => {
-				const beforeTotalSupply = await token.totalSupply()
-				expect(beforeTotalSupply).to.deep.equal(0)
-				await token.setTokenIds([100001, 200010])
-				await token.setTokenIds([300001, 400010])
-				const afterTotalSupply = await token.totalSupply()
-				expect(afterTotalSupply).to.deep.equal(4)
-				const tokenId1 = await token.getTokenId(0)
-				expect(tokenId1).to.deep.equal(100001)
-				const tokenId2 = await token.getTokenId(1)
-				expect(tokenId2).to.deep.equal(200010)
-				const tokenId3 = await token.getTokenId(2)
-				expect(tokenId3).to.deep.equal(300001)
-				const tokenId4 = await token.getTokenId(3)
-				expect(tokenId4).to.deep.equal(400010)
-			})
-		})
-		describe('fail', () => {
-			it('not owner', async () => {
-				const account = await ethers.getSigners()
-				const adminRole = await token.DEFAULT_ADMIN_ROLE()
-				const sender = account[2]
-				const msg = `AccessControl: account ${sender.address.toLowerCase()} is missing role ${adminRole}`
-				await expect(
-					token.connect(sender).setTokenIds([0, 1])
-				).to.be.revertedWith(msg)
-			})
-		})
-	})
 	describe('setAssetData', () => {
 		describe('success', () => {
 			it('set id list', async () => {
@@ -421,36 +390,38 @@ describe('ERC721Token', () => {
 
 				await token.setAssetData(
 					[1, 2],
-					[10, 20],
-					['name1', 'name2'],
-					['uri1', 'uri2']
+					[
+						{ totalNumberOfSerialId: 10, assetName: 'name1', uri: '' },
+						{ totalNumberOfSerialId: 20, assetName: 'name2', uri: '' },
+					]
 				)
 				await token.setAssetData(
 					[3, 4],
-					[30, 40],
-					['name3', 'name4'],
-					['uri3', 'uri4']
+					[
+						{ totalNumberOfSerialId: 30, assetName: 'name3', uri: '' },
+						{ totalNumberOfSerialId: 40, assetName: 'name4', uri: '' },
+					]
 				)
 
 				const assetData1 = await token.getAssetData(1)
 				expect(assetData1.total_number).to.deep.equal(10)
 				expect(assetData1.asset_name).to.deep.equal('name1')
-				expect(assetData1.uri).to.deep.equal('uri1')
+				expect(assetData1.uri).to.deep.equal('https://dea')
 
 				const assetData2 = await token.getAssetData(2)
 				expect(assetData2.total_number).to.deep.equal(20)
 				expect(assetData2.asset_name).to.deep.equal('name2')
-				expect(assetData2.uri).to.deep.equal('uri2')
+				expect(assetData2.uri).to.deep.equal('https://dea')
 
 				const assetData3 = await token.getAssetData(3)
 				expect(assetData3.total_number).to.deep.equal(30)
 				expect(assetData3.asset_name).to.deep.equal('name3')
-				expect(assetData3.uri).to.deep.equal('uri3')
+				expect(assetData3.uri).to.deep.equal('https://dea')
 
 				const assetData4 = await token.getAssetData(4)
 				expect(assetData4.total_number).to.deep.equal(40)
 				expect(assetData4.asset_name).to.deep.equal('name4')
-				expect(assetData4.uri).to.deep.equal('uri4')
+				expect(assetData4.uri).to.deep.equal('https://dea')
 			})
 		})
 		describe('fail', () => {
@@ -460,14 +431,13 @@ describe('ERC721Token', () => {
 				const sender = account[2]
 				const msg = `AccessControl: account ${sender.address.toLowerCase()} is missing role ${adminRole}`
 				await expect(
-					token
-						.connect(sender)
-						.setAssetData(
-							[1, 2],
-							[10, 20],
-							['name1', 'name2'],
-							['uri1', 'uri2']
-						)
+					token.connect(sender).setAssetData(
+						[3, 4],
+						[
+							{ totalNumberOfSerialId: 30, assetName: 'name3', uri: '' },
+							{ totalNumberOfSerialId: 40, assetName: 'name4', uri: '' },
+						]
+					)
 				).to.be.revertedWith(msg)
 			})
 		})
@@ -489,16 +459,17 @@ describe('ERC721Token', () => {
 				const beforeBalance4 = await token.balanceOf(user4.address)
 				expect(beforeBalance4).to.deep.equal(0)
 
-				await token.setNftData(
-					['uri1', 'uri2'],
-					[1, 2],
-					[user1.address, user2.address]
-				)
-				await token.setNftData(
-					['uri3', 'uri4'],
-					[3, 4],
-					[user3.address, user4.address]
-				)
+				const beforeTotalSupply = await token.totalSupply()
+				expect(beforeTotalSupply).to.deep.equal(0)
+
+				await token.setNftData([
+					{ tokenId: 1, owner: user1.address },
+					{ tokenId: 2, owner: user2.address },
+				])
+				await token.setNftData([
+					{ tokenId: 3, owner: user3.address },
+					{ tokenId: 4, owner: user4.address },
+				])
 
 				const afterBalance1 = await token.balanceOf(user1.address)
 				expect(afterBalance1).to.deep.equal(1)
@@ -519,13 +490,25 @@ describe('ERC721Token', () => {
 				expect(owner4).to.deep.equal(user4.address)
 
 				const uri1 = await token.tokenURI(1)
-				expect(uri1).to.deep.equal('uri1')
+				expect(uri1).to.deep.equal('https://dea')
 				const uri2 = await token.tokenURI(2)
-				expect(uri2).to.deep.equal('uri2')
+				expect(uri2).to.deep.equal('https://dea')
 				const uri3 = await token.tokenURI(3)
-				expect(uri3).to.deep.equal('uri3')
+				expect(uri3).to.deep.equal('https://dea')
 				const uri4 = await token.tokenURI(4)
-				expect(uri4).to.deep.equal('uri4')
+				expect(uri4).to.deep.equal('https://dea')
+
+				const afterTotalSupply = await token.totalSupply()
+				expect(afterTotalSupply).to.deep.equal(4)
+
+				const tokenId1 = await token.getTokenId(0)
+				expect(tokenId1).to.deep.equal(1)
+				const tokenId2 = await token.getTokenId(1)
+				expect(tokenId2).to.deep.equal(2)
+				const tokenId3 = await token.getTokenId(2)
+				expect(tokenId3).to.deep.equal(3)
+				const tokenId4 = await token.getTokenId(3)
+				expect(tokenId4).to.deep.equal(4)
 			})
 		})
 		describe('fail', () => {
@@ -537,13 +520,10 @@ describe('ERC721Token', () => {
 				const sender = account[2]
 				const msg = `AccessControl: account ${sender.address.toLowerCase()} is missing role ${adminRole}`
 				await expect(
-					token
-						.connect(sender)
-						.setNftData(
-							['uri1', 'uri2'],
-							[100001, 200001],
-							[user1.address, user2.address]
-						)
+					token.connect(sender).setNftData([
+						{ tokenId: 100001, owner: user1.address },
+						{ tokenId: 200001, owner: user2.address },
+					])
 				).to.be.revertedWith(msg)
 			})
 		})
