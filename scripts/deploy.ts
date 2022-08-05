@@ -18,3 +18,12 @@ main()
 		console.error(error)
 		process.exit(1)
 	})
+
+// Proxy was deployed to: 0x45B7d3a1187a8242dD7ae6CB1aDE9959cFE17fD3
+// logic was deployed to: 0x848E40324046612317AEE3907B7D7Fe9a2F5f90a
+
+// proxy was deployed to: 0xBa5FA098d36fbAdC0C21C31025180d05A7048126
+// logic was deployed to: 0x848E40324046612317AEE3907B7D7Fe9a2F5f90a
+
+// minterも忘れずに
+// DummyURLを書き換える

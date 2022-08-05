@@ -20,7 +20,7 @@ contract ERC721TokenUpgradable is
 	//基数設定
 	uint256 private constant ASSET_ID_CARDINAL_NUMBER =
 		10**uint256(SERIAL_ID_DECIMAL);
-	uint256 public serialIdUpperLimit = (10**uint256(SERIAL_ID_DECIMAL)) - 1;
+	uint256 public serialIdUpperLimit;
 	mapping(uint256 => string) private _tokenURIs;
 	// 互換のため、命名規則は無視
 	// solhint-disable-next-line var-name-mixedcase
@@ -34,6 +34,7 @@ contract ERC721TokenUpgradable is
 		__AccessControlEnumerable_init();
 		_setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
 		_setupRole(MINTER_ROLE, _msgSender());
+		serialIdUpperLimit = (10**uint256(SERIAL_ID_DECIMAL)) - 1;
 	}
 
 	function supportsInterface(bytes4 _interfaceId)

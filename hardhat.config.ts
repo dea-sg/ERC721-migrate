@@ -12,6 +12,11 @@ const privateKey =
 		? '0000000000000000000000000000000000000000000000000000000000000000'
 		: process.env.PRIVATE_KEY
 
+const privateNetworkUrl =
+	process.env.PRIVATE_NETWORK_URL === 'undefined'
+		? 'https://hogehoge'
+		: process.env.PRIVATE_NETWORK_URL
+
 const config = {
 	solidity: {
 		version: '0.8.9',
@@ -23,6 +28,10 @@ const config = {
 		},
 	},
 	networks: {
+		testPrivate: {
+			url: privateNetworkUrl,
+			accounts: [privateKey],
+		},
 		rinkeby: {
 			url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ARCHEMY_KEY!}`,
 			accounts: [privateKey],
