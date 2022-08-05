@@ -320,19 +320,6 @@ contract ERC721TokenUpgradable is
 	{}
 
 	// import function
-	// function setAssetData(
-	// 	uint256[] memory _assetIds,
-	// 	uint256[] memory _totalNumberOfSerialIds,
-	// 	string[] memory _assetNames
-	// ) external onlyRole(DEFAULT_ADMIN_ROLE) {
-	// 	for (uint256 index = 0; index < _assetIds.length; index++) {
-	// 		asset_info[_assetIds[index]] = AssetData(
-	// 			_totalNumberOfSerialIds[index],
-	// 			_assetNames[index],
-	// 			DUMMY_URI
-	// 		);
-	// 	}
-	// }
 	function setAssetData(
 		uint256[] memory _assetIds,
 		AssetData[] memory _assetDataList
