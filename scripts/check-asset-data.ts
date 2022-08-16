@@ -10,9 +10,9 @@ async function main() {
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
 	const token = new ethers.Contract(contractAddress, abi, account[0])
-	const asset1 = await token.getAssetData(1)
+	const asset1 = await token.getAssetData(1019)
 	console.log(asset1)
-	const asset2 = await token.getAssetData(2)
+	const asset2 = await token.getAssetData(464)
 	console.log(asset2)
 }
 

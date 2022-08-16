@@ -13,11 +13,12 @@ async function main() {
 	// Type Mapping = {
 	//     tokenId: string;
 	//     owner: string;
+	//     assetId: string
 	//   };
 
 	/// /////////////////////////////////////////////////////
 	const contractAddress = ''
-	const csvpath = ''
+	const csvpath = '/ERC721-migrate/test/token_holder.csv'
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
 	const token = new Contract(contractAddress, abi, account[0])
@@ -25,7 +26,15 @@ async function main() {
 	const tmpData = []
 	for (const data of array) {
 		tmpData.push(data)
-		if (tmpData.length === 10000) {
+		// Oversized dataが発生するギリギリまでを設定する
+		// transactionの格納されているdataが32KB以上の場合に発生
+		// このエラーはDOS攻撃対策のためのエラー
+		if (tmpData.length === 90) {
+			// ガス設定したら100が限界
+			// 25はデータ登録されない
+			// 20はデータ登録される
+
+			// gas 0だと90いける
 			await insert(token, tmpData)
 			tmpData.splice(0)
 		}
@@ -40,14 +49,30 @@ async function main() {
 
 const insert = async (token: Contract, tmpData: any[]): Promise<void> => {
 	const args = []
+	let first = 0
+	let last = 0
 	for (const tmp of tmpData) {
+		if (first === 0) {
+			first = tmp.tokenId
+		}
+
 		args.push({
 			tokenId: tmp.tokenId,
-			owner: tmp.owner,
+			owner: tmp.holderAddress,
+			assetId: tmp.assetId,
 		})
+		last = tmp.tokenId
 	}
 
-	await token.setNftData(args)
+	console.log(`first:${first}:  last:${last}`)
+	const now = new Date()
+	console.log(now)
+	const tx = await token.setNftData(args)
+	await tx.wait()
+	const owner = await token.ownerOf(last)
+	if (owner === ethers.constants.AddressZero) {
+		throw Error('data not found')
+	}
 }
 
 main()
@@ -56,3 +81,5 @@ main()
 		console.error(error)
 		process.exit(1)
 	})
+
+// Gas price0でやってみる

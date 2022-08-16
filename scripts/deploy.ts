@@ -26,4 +26,5 @@ main()
 // logic was deployed to: 0x848E40324046612317AEE3907B7D7Fe9a2F5f90a
 
 // minterも忘れずに
-// DummyURLを書き換える
+// proxy was deployed to: 0xbC6F25Df664cD64d4384F97bEf60A61623528f85
+// logic was deployed to: 0xcCb3F56AA3e998ee6A662EA822DCd3238C002933

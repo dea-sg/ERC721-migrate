@@ -31,6 +31,7 @@ const config = {
 		testPrivate: {
 			url: privateNetworkUrl,
 			accounts: [privateKey],
+			gasPrice: 0,
 		},
 		rinkeby: {
 			url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ARCHEMY_KEY!}`,

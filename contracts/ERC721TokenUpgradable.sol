@@ -5,6 +5,7 @@ import "@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "./IERC721TokenUpgradable.sol";
 
 contract ERC721TokenUpgradable is
@@ -13,8 +14,8 @@ contract ERC721TokenUpgradable is
 	ERC721Upgradeable,
 	IERC721TokenUpgradable
 {
+	using StringsUpgradeable for uint256;
 	bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-	string private constant DUMMY_URI = "https://dea";
 	//桁設定
 	uint256 private constant SERIAL_ID_DECIMAL = 5;
 	//基数設定
@@ -77,6 +78,10 @@ contract ERC721TokenUpgradable is
 			// abi.encodePacked is being used to concatenate strings
 			return string(abi.encodePacked(_baseURI(), tokenURI_));
 		}
+	}
+
+	function _baseURI() internal view virtual override returns (string memory) {
+		return "https://playmining.com/metadata/";
 	}
 
 	/**
@@ -187,7 +192,6 @@ contract ERC721TokenUpgradable is
 	 * @param _user address トークンを配布したいアドレス
 	 * @param _assetId uint256
 	 * @param _assetName string
-	 * @param _tokenUri string
 	 * @param _total uint256　何回で作る
 	 * @return bool
 	 */
@@ -195,17 +199,17 @@ contract ERC721TokenUpgradable is
 		address _user,
 		uint256 _assetId,
 		string calldata _assetName,
-		string calldata _tokenUri,
+		string calldata,
 		uint256 _total
 	) external onlyRole(MINTER_ROLE) returns (bool) {
 		require(_assetId > 0, "the asset id is lower than 0");
 		// solhint-disable-next-line reason-string
 		require(_total > 0, "the number of running times is lower than 0");
 		require(_user != address(0), "address is zero address");
-		require(bytes(_tokenUri).length > 0, "URI is empty");
+		//require(bytes(_tokenUri).length > 0, "URI is empty");
 		require(bytes(_assetName).length > 0, "asset name is empty");
 
-		mintWithAssetId(_user, _assetId, _assetName, _tokenUri, _total);
+		mintWithAssetId(_user, _assetId, _assetName, _total);
 
 		return true;
 	}
@@ -215,7 +219,6 @@ contract ERC721TokenUpgradable is
 	 * @param _user address トークンを配布したいアドレス
 	 * @param _assetId uint256
 	 * @param _assetName string
-	 * @param _tokenUri string
 	 * @param _total uint256　何回で作る
 	 * @return bool
 	 */
@@ -223,7 +226,6 @@ contract ERC721TokenUpgradable is
 		address _user,
 		uint256 _assetId,
 		string memory _assetName,
-		string memory _tokenUri,
 		uint256 _total
 	) internal returns (bool) {
 		uint256 tokenId;
@@ -234,9 +236,12 @@ contract ERC721TokenUpgradable is
 
 		//アセットデータが存在しなければ作る
 		//if asset id does not exist
+		string memory uri = string(
+			abi.encodePacked(_baseURI(), _assetId.toString())
+		);
 		if (assetData.totalNumberOfSerialId == 0) {
 			//create new AssetData struct
-			asset_info[_assetId] = AssetData(0, _assetName, _tokenUri);
+			asset_info[_assetId] = AssetData(0, _assetName, uri);
 			assetData = asset_info[_assetId];
 		}
 
@@ -252,7 +257,7 @@ contract ERC721TokenUpgradable is
 		//URI validation
 		require(
 			keccak256(abi.encodePacked(assetData.uri)) ==
-				keccak256(abi.encodePacked(_tokenUri)),
+				keccak256(abi.encodePacked(uri)),
 			"URI does not match"
 		);
 
@@ -281,7 +286,7 @@ contract ERC721TokenUpgradable is
 
 			//トークンを配布する
 			//transfer token
-			mintWithTokenURI(_user, tokenId, _tokenUri);
+			mintWithTokenURI(_user, tokenId, _assetId);
 		}
 
 		//アセットが紐づけシリアル総量を更新する
@@ -291,18 +296,18 @@ contract ERC721TokenUpgradable is
 		return true;
 	}
 
-	function _setTokenURI(uint256 _tokenId, string memory _tokenURI) private {
+	function _setTokenURI(uint256 _tokenId, uint256 _assetId) private {
 		_requireMinted(_tokenId);
-		_tokenURIs[_tokenId] = _tokenURI;
+		_tokenURIs[_tokenId] = _assetId.toString();
 	}
 
 	function mintWithTokenURI(
 		address _to,
 		uint256 _tokenId,
-		string memory _tokenURI
+		uint256 _assetId
 	) private onlyRole(MINTER_ROLE) returns (bool) {
 		_mint(_to, _tokenId);
-		_setTokenURI(_tokenId, _tokenURI);
+		_setTokenURI(_tokenId, _assetId);
 		return true;
 	}
 
@@ -328,7 +333,9 @@ contract ERC721TokenUpgradable is
 		require(_assetIds.length == _assetDataList.length, "illegal data");
 		for (uint256 index = 0; index < _assetIds.length; index++) {
 			AssetData memory tmp = _assetDataList[index];
-			tmp.uri = DUMMY_URI;
+			tmp.uri = string(
+				abi.encodePacked(_baseURI(), _assetIds[index].toString())
+			);
 			asset_info[_assetIds[index]] = tmp;
 		}
 	}
@@ -340,7 +347,7 @@ contract ERC721TokenUpgradable is
 		for (uint256 index = 0; index < _tokenOwners.length; index++) {
 			TokenOwner memory tmp = _tokenOwners[index];
 			_mint(tmp.owner, tmp.tokenId);
-			_tokenURIs[tmp.tokenId] = DUMMY_URI;
+			_tokenURIs[tmp.tokenId] = tmp.assetId.toString();
 			tokenList.push(tmp.tokenId);
 		}
 	}

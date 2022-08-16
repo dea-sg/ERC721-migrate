@@ -19,7 +19,7 @@ async function main() {
 
 	/// /////////////////////////////////////////////////////
 	const contractAddress = ''
-	const csvpath = ''
+	const csvpath = '/ERC721-migrate/test/asset.csv'
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
 	const token = new Contract(contractAddress, abi, account[0])
@@ -27,7 +27,12 @@ async function main() {
 	const tmpData = []
 	for (const data of array) {
 		tmpData.push(data)
-		if (tmpData.length === 10000) {
+		// ガス指定した場合、
+		// 100にしてもエラーにはならないが、データは保存されない
+		// テスト環境では30が限界だった
+
+		// gas 0の場合、80はアウトで70はセーフ
+		if (tmpData.length === 70) {
 			await insert(token, tmpData)
 			tmpData.splice(0)
 		}
@@ -43,16 +48,31 @@ async function main() {
 const insert = async (token: Contract, tmpData: any[]): Promise<void> => {
 	const assetIds = []
 	const assetDataList = []
+	let first = 0
+	let last = 0
 	for (const tmp of tmpData) {
+		if (first === 0) {
+			first = tmp.assetId
+		}
+
 		assetIds.push(tmp.assetId)
 		assetDataList.push({
-			totalNumberOfSerialId: tmp.totalNumber,
-			assetName: tmp.name,
+			totalNumberOfSerialId: tmp.totalNumberOfSerialId,
+			assetName: tmp.assetName,
 			uri: '',
 		})
+		last = tmp.assetId
 	}
 
-	await token.setAssetData(assetIds, assetDataList)
+	console.log(`first:${first}:  last:${last}`)
+	const now = new Date()
+	console.log(now)
+	const tx = await token.setAssetData(assetIds, assetDataList)
+	await tx.wait()
+	const assetData = await token.getAssetData(last)
+	if (assetData.assetName === '') {
+		throw Error('data not found')
+	}
 }
 
 main()

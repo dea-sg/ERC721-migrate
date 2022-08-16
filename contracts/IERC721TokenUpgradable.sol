@@ -13,6 +13,7 @@ interface IERC721TokenUpgradable {
 	struct TokenOwner {
 		uint256 tokenId;
 		address owner;
+		uint256 assetId;
 	}
 
 	function getTokenId(uint256 _index) external view returns (uint256);

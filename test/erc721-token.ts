@@ -123,7 +123,7 @@ describe('ERC721Token', () => {
 				const user = Wallet.createRandom()
 				await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
 				const result = await token.tokenURI(100001)
-				expect(result).to.equal('test uri')
+				expect(result).to.equal('https://playmining.com/metadata/1')
 			})
 		})
 		describe('fail', () => {
@@ -240,7 +240,7 @@ describe('ERC721Token', () => {
 			const assetData = await token.getAssetData(1)
 			expect(assetData.total_number).to.equal(1)
 			expect(assetData.asset_name).to.equal('test name')
-			expect(assetData.uri).to.equal('test uri')
+			expect(assetData.uri).to.equal('https://playmining.com/metadata/1')
 		})
 		it('2 minted', async () => {
 			const user = Wallet.createRandom()
@@ -249,7 +249,7 @@ describe('ERC721Token', () => {
 			const assetData = await token.getAssetData(2)
 			expect(assetData.total_number).to.equal(2)
 			expect(assetData.asset_name).to.equal('test name2')
-			expect(assetData.uri).to.equal('test uri2')
+			expect(assetData.uri).to.equal('https://playmining.com/metadata/2')
 		})
 	})
 
@@ -268,8 +268,8 @@ describe('ERC721Token', () => {
 				expect(afterBalance).to.equal(1)
 				const owner = await token.ownerOf(100001)
 				expect(owner).to.equal(user.address)
-				const beforeTokenURI = await token.tokenURI(100001)
-				expect(beforeTokenURI).to.equal('toke uri')
+				const afterTokenURI = await token.tokenURI(100001)
+				expect(afterTokenURI).to.equal('https://playmining.com/metadata/1')
 			})
 			it('create asset data', async () => {
 				const user = Wallet.createRandom()
@@ -281,7 +281,7 @@ describe('ERC721Token', () => {
 				const afterAssetData = await token.getAssetData(1)
 				expect(afterAssetData.total_number).to.equal(1)
 				expect(afterAssetData.asset_name).to.equal('token-name')
-				expect(afterAssetData.uri).to.equal('toke uri')
+				expect(afterAssetData.uri).to.equal('https://playmining.com/metadata/1')
 			})
 			it('create many asset data', async () => {
 				const user = Wallet.createRandom()
@@ -301,11 +301,11 @@ describe('ERC721Token', () => {
 				const owner3 = await token.ownerOf(100001)
 				expect(owner3).to.equal(user.address)
 				const tokenURI1 = await token.tokenURI(100001)
-				expect(tokenURI1).to.equal('toke uri')
+				expect(tokenURI1).to.equal('https://playmining.com/metadata/1')
 				const tokenURI2 = await token.tokenURI(100002)
-				expect(tokenURI2).to.equal('toke uri')
+				expect(tokenURI2).to.equal('https://playmining.com/metadata/1')
 				const tokenURI3 = await token.tokenURI(100003)
-				expect(tokenURI3).to.equal('toke uri')
+				expect(tokenURI3).to.equal('https://playmining.com/metadata/1')
 			})
 			it('added total number', async () => {
 				const user = Wallet.createRandom()
@@ -344,12 +344,6 @@ describe('ERC721Token', () => {
 					token.bulkMint(ethers.constants.AddressZero, 1, '', '', 1)
 				).to.be.revertedWith('address is zero address')
 			})
-			it('toke uri is empty', async () => {
-				const user = Wallet.createRandom()
-				await expect(
-					token.bulkMint(user.address, 1, '', '', 1)
-				).to.be.revertedWith('URI is empty')
-			})
 			it('name is empty', async () => {
 				const user = Wallet.createRandom()
 				await expect(
@@ -363,13 +357,6 @@ describe('ERC721Token', () => {
 					token.bulkMint(user.address, 1, 'token-name2', 'toke uri', 1)
 				).to.be.revertedWith('asset name does not match')
 			})
-			it('toke uri is different', async () => {
-				const user = Wallet.createRandom()
-				await token.bulkMint(user.address, 1, 'token-name', 'toke uri', 1)
-				await expect(
-					token.bulkMint(user.address, 1, 'token-name', 'toke uri2', 1)
-				).to.be.revertedWith('URI does not match')
-			})
 			it('over serial limit', async () => {
 				const user = Wallet.createRandom()
 				await token.setSerialIdUpperLimit(5)
@@ -382,7 +369,7 @@ describe('ERC721Token', () => {
 	})
 	describe('setAssetData', () => {
 		describe('success', () => {
-			it('set id list', async () => {
+			it('set asset data', async () => {
 				await checkDefaultAssetData(1)
 				await checkDefaultAssetData(2)
 				await checkDefaultAssetData(3)
@@ -406,22 +393,30 @@ describe('ERC721Token', () => {
 				const assetData1 = await token.getAssetData(1)
 				expect(assetData1.total_number).to.deep.equal(10)
 				expect(assetData1.asset_name).to.deep.equal('name1')
-				expect(assetData1.uri).to.deep.equal('https://dea')
+				expect(assetData1.uri).to.deep.equal(
+					'https://playmining.com/metadata/1'
+				)
 
 				const assetData2 = await token.getAssetData(2)
 				expect(assetData2.total_number).to.deep.equal(20)
 				expect(assetData2.asset_name).to.deep.equal('name2')
-				expect(assetData2.uri).to.deep.equal('https://dea')
+				expect(assetData2.uri).to.deep.equal(
+					'https://playmining.com/metadata/2'
+				)
 
 				const assetData3 = await token.getAssetData(3)
 				expect(assetData3.total_number).to.deep.equal(30)
 				expect(assetData3.asset_name).to.deep.equal('name3')
-				expect(assetData3.uri).to.deep.equal('https://dea')
+				expect(assetData3.uri).to.deep.equal(
+					'https://playmining.com/metadata/3'
+				)
 
 				const assetData4 = await token.getAssetData(4)
 				expect(assetData4.total_number).to.deep.equal(40)
 				expect(assetData4.asset_name).to.deep.equal('name4')
-				expect(assetData4.uri).to.deep.equal('https://dea')
+				expect(assetData4.uri).to.deep.equal(
+					'https://playmining.com/metadata/4'
+				)
 			})
 		})
 		describe('fail', () => {
@@ -463,12 +458,12 @@ describe('ERC721Token', () => {
 				expect(beforeTotalSupply).to.deep.equal(0)
 
 				await token.setNftData([
-					{ tokenId: 1, owner: user1.address },
-					{ tokenId: 2, owner: user2.address },
+					{ tokenId: 1, owner: user1.address, assetId: 10 },
+					{ tokenId: 2, owner: user2.address, assetId: 20 },
 				])
 				await token.setNftData([
-					{ tokenId: 3, owner: user3.address },
-					{ tokenId: 4, owner: user4.address },
+					{ tokenId: 3, owner: user3.address, assetId: 30 },
+					{ tokenId: 4, owner: user4.address, assetId: 40 },
 				])
 
 				const afterBalance1 = await token.balanceOf(user1.address)
@@ -490,13 +485,13 @@ describe('ERC721Token', () => {
 				expect(owner4).to.deep.equal(user4.address)
 
 				const uri1 = await token.tokenURI(1)
-				expect(uri1).to.deep.equal('https://dea')
+				expect(uri1).to.deep.equal('https://playmining.com/metadata/10')
 				const uri2 = await token.tokenURI(2)
-				expect(uri2).to.deep.equal('https://dea')
+				expect(uri2).to.deep.equal('https://playmining.com/metadata/20')
 				const uri3 = await token.tokenURI(3)
-				expect(uri3).to.deep.equal('https://dea')
+				expect(uri3).to.deep.equal('https://playmining.com/metadata/30')
 				const uri4 = await token.tokenURI(4)
-				expect(uri4).to.deep.equal('https://dea')
+				expect(uri4).to.deep.equal('https://playmining.com/metadata/40')
 
 				const afterTotalSupply = await token.totalSupply()
 				expect(afterTotalSupply).to.deep.equal(4)
@@ -521,8 +516,8 @@ describe('ERC721Token', () => {
 				const msg = `AccessControl: account ${sender.address.toLowerCase()} is missing role ${adminRole}`
 				await expect(
 					token.connect(sender).setNftData([
-						{ tokenId: 100001, owner: user1.address },
-						{ tokenId: 200001, owner: user2.address },
+						{ tokenId: 100001, owner: user1.address, assetId: 10 },
+						{ tokenId: 200001, owner: user2.address, assetId: 20 },
 					])
 				).to.be.revertedWith(msg)
 			})
