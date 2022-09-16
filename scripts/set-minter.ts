@@ -14,7 +14,7 @@ async function main() {
 	const account = await ethers.getSigners()
 	const token = new ethers.Contract(contractAddress, abi, account[0])
 	const minterRole = await token.MINTER_ROLE()
-	// await token.grantRole(minterRole, minterAddress)
+	// Await token.grantRole(minterRole, minterAddress)
 	const hasRole = await token.hasRole(minterRole, minterAddress)
 	console.log(`result:${hasRole}`)
 }

@@ -29,6 +29,5 @@ main()
 // proxy was deployed to: 0xbC6F25Df664cD64d4384F97bEf60A61623528f85
 // logic was deployed to: 0xcCb3F56AA3e998ee6A662EA822DCd3238C002933
 
-
 // proxy was deployed to: 0x7c72c6C5121F74a67D8dcC2d3FC419315a275334
 // logic was deployed to: 0x5fa6fE6255553B0aDD787353bA45724fDF3067b3
