@@ -5,7 +5,7 @@ import { Wallet } from 'ethers'
 
 async function main() {
 	/// /////////////////////////////////////////////////////
-	const filePath = '/ERC721-migrate/test/token_holder.csv'
+	const filePath = '/Users/akira/dea/ERC721-migrate/test/token_holder.csv'
 	const recordCount = 650000
 	/// /////////////////////////////////////////////////////
 	const csvWriter = createObjectCsvWriter({
@@ -49,3 +49,5 @@ main()
 		console.error(error)
 		process.exit(1)
 	})
+
+// Npx hardhat run dist/scripts/create-nft-data.js --network testPrivate

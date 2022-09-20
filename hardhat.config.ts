@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 import '@nomicfoundation/hardhat-toolbox'
 import '@openzeppelin/hardhat-upgrades'
 import '@nomicfoundation/hardhat-chai-matchers'
@@ -32,21 +30,6 @@ const config = {
 			url: privateNetworkUrl,
 			accounts: [privateKey],
 			gasPrice: 0,
-		},
-		rinkeby: {
-			url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ARCHEMY_KEY!}`,
-			accounts: [privateKey],
-		},
-		polygonMumbai: {
-			url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env
-				.ARCHEMY_KEY!}`,
-			accounts: [privateKey],
-		},
-	},
-	etherscan: {
-		apiKey: {
-			rinkeby: process.env.ETHERSCAN_API_KEY!,
-			polygonMumbai: process.env.POLYGONSCAN_API_KEY!,
 		},
 	},
 }

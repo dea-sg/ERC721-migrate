@@ -17,8 +17,8 @@ async function main() {
 	//   };
 
 	/// /////////////////////////////////////////////////////
-	const contractAddress = ''
-	const csvpath = '/ERC721-migrate/test/token_holder.csv'
+	const contractAddress = '0x7c72c6C5121F74a67D8dcC2d3FC419315a275334'
+	const csvpath = '/Users/akira/dea/ERC721-migrate/scripts/tokens.csv'
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
 	const token = new Contract(contractAddress, abi, account[0])
@@ -82,4 +82,4 @@ main()
 		process.exit(1)
 	})
 
-// Gas price0でやってみる
+// Npx hardhat run dist/scripts/import-owners.js --network testPrivate

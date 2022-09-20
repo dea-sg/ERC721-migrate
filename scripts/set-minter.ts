@@ -8,13 +8,13 @@ import { abi } from '../artifacts/contracts/ERC721TokenUpgradable.sol/ERC721Toke
 
 async function main() {
 	/// /////////////////////////////////////////////////////
-	const contractAddress = ''
-	const minterAddress = ''
+	const contractAddress = '0x7c72c6C5121F74a67D8dcC2d3FC419315a275334'
+	const minterAddress = '0x219fbdec0e20ef46aadff75861747df9cd83c65f'
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
 	const token = new ethers.Contract(contractAddress, abi, account[0])
 	const minterRole = await token.MINTER_ROLE()
-	// Await token.grantRole(minterRole, minterAddress)
+	await token.grantRole(minterRole, minterAddress)
 	const hasRole = await token.hasRole(minterRole, minterAddress)
 	console.log(`result:${hasRole}`)
 }
@@ -25,3 +25,5 @@ main()
 		console.error(error)
 		process.exit(1)
 	})
+
+// Npx hardhat run dist/scripts/set-minter.js --network testPrivate

@@ -4,7 +4,7 @@ import { ObjectMap } from 'csv-writer/src/lib/lang/object'
 
 async function main() {
 	/// /////////////////////////////////////////////////////
-	const filePath = '/ERC721-migrate/test/asset.csv'
+	const filePath = '/Users/akira/dea/ERC721-migrate/test/asset.csv'
 	const recordCount = 1200
 	/// /////////////////////////////////////////////////////
 	const csvWriter = createObjectCsvWriter({
@@ -35,3 +35,5 @@ main()
 		console.error(error)
 		process.exit(1)
 	})
+
+// Npx hardhat run dist/scripts/create-asset-data.js --network testPrivate

@@ -18,8 +18,8 @@ async function main() {
 	//   };
 
 	/// /////////////////////////////////////////////////////
-	const contractAddress = ''
-	const csvpath = '/ERC721-migrate/test/asset.csv'
+	const contractAddress = '0x7c72c6C5121F74a67D8dcC2d3FC419315a275334'
+	const csvpath = '/Users/akira/dea/ERC721-migrate/scripts/assets.csv'
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
 	const token = new Contract(contractAddress, abi, account[0])
@@ -32,7 +32,8 @@ async function main() {
 		// テスト環境では30が限界だった
 
 		// gas 0の場合、80はアウトで70はセーフ
-		if (tmpData.length === 70) {
+		// 試験では70はアウトだった、多分本番さながらのデータだったため、
+		if (tmpData.length === 60) {
 			await insert(token, tmpData)
 			tmpData.splice(0)
 		}
@@ -81,3 +82,4 @@ main()
 		console.error(error)
 		process.exit(1)
 	})
+// Npx hardhat run dist/scripts/import-asset-data.js --network testPrivate
