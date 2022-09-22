@@ -31,3 +31,8 @@ main()
 
 // proxy was deployed to: 0x7c72c6C5121F74a67D8dcC2d3FC419315a275334
 // logic was deployed to: 0x5fa6fE6255553B0aDD787353bA45724fDF3067b3
+
+// npx hardhat run dist/scripts/deploy.js --network testPrivate
+
+// proxy was deployed to: 0xB0071322dB5fcdA6DDA03aE456524C3E5E5D07A3
+// logic was deployed to: 0x788cc3634368696f8cc474353e821111b4bb8AbC
