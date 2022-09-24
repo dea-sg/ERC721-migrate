@@ -17,7 +17,7 @@ async function main() {
 	//   };
 
 	/// /////////////////////////////////////////////////////
-	const contractAddress = '0x7c72c6C5121F74a67D8dcC2d3FC419315a275334'
+	const contractAddress = '0xB0071322dB5fcdA6DDA03aE456524C3E5E5D07A3'
 	const csvpath = '/Users/akira/dea/ERC721-migrate/scripts/tokens.csv'
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
