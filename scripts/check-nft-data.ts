@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/naming-convention */
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { ethers } from 'hardhat'
@@ -12,7 +12,7 @@ async function main() {
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
 	const token = new ethers.Contract(contractAddress, abi, account[0])
-	// const totalSupply = await token.totalSupply()
+	// Const totalSupply = await token.totalSupply()
 	// console.log(`totalSupply:${totalSupply}`)
 	// const tokenURI1 = await token.tokenURI(1080)
 	// console.log(`tokenURI1:${tokenURI1}`)
