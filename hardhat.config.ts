@@ -26,7 +26,7 @@ const config = {
 		},
 	},
 	networks: {
-		testPrivate: {
+		private: {
 			url: privateNetworkUrl,
 			accounts: [privateKey],
 			gasPrice: 0,
