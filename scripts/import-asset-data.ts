@@ -18,7 +18,7 @@ async function main() {
 	//   };
 
 	/// /////////////////////////////////////////////////////
-	const contractAddress = '0xB0071322dB5fcdA6DDA03aE456524C3E5E5D07A3'
+	const contractAddress = '0xcCb3F56AA3e998ee6A662EA822DCd3238C002933'
 	const csvpath = '/Users/akira/dea/ERC721-migrate/scripts/assets.csv'
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
@@ -33,7 +33,8 @@ async function main() {
 
 		// gas 0の場合、80はアウトで70はセーフ
 		// 試験では70はアウトだった、多分本番さながらのデータだったため、
-		if (tmpData.length === 60) {
+		// 基本は60でいける
+		if (tmpData.length === 20) {
 			await insert(token, tmpData)
 			tmpData.splice(0)
 		}
@@ -82,4 +83,4 @@ main()
 		console.error(error)
 		process.exit(1)
 	})
-// Npx hardhat run dist/scripts/import-asset-data.js --network testPrivate
+// Npx hardhat run dist/scripts/import-asset-data.js --network private

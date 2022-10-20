@@ -8,7 +8,7 @@ import { abi } from '../artifacts/contracts/ERC721TokenUpgradable.sol/ERC721Toke
 
 async function main() {
 	/// /////////////////////////////////////////////////////
-	const contractAddress = '0xB0071322dB5fcdA6DDA03aE456524C3E5E5D07A3'
+	const contractAddress = '0xcCb3F56AA3e998ee6A662EA822DCd3238C002933'
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
 	const token = new ethers.Contract(contractAddress, abi, account[0])
@@ -22,9 +22,9 @@ async function main() {
 	// console.log(`tokenId1:${tokenId1}`)
 	// const tokenId2 = await token.getTokenId(361)
 	// console.log(`tokenId2:${tokenId2}`)
-	const owner1 = await token.ownerOf(167100175)
+	const owner1 = await token.ownerOf(200700624)
 	console.log(`owner1:${owner1}`)
-	const owner2 = await token.ownerOf(167100075)
+	const owner2 = await token.ownerOf(200700625)
 	console.log(`owner2:${owner2}`)
 }
 

@@ -17,7 +17,7 @@ async function main() {
 	//   };
 
 	/// /////////////////////////////////////////////////////
-	const contractAddress = '0xB0071322dB5fcdA6DDA03aE456524C3E5E5D07A3'
+	const contractAddress = '0xcCb3F56AA3e998ee6A662EA822DCd3238C002933'
 	const csvpath = '/Users/akira/dea/ERC721-migrate/scripts/tokens.csv'
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
@@ -29,12 +29,13 @@ async function main() {
 		// Oversized dataが発生するギリギリまでを設定する
 		// transactionの格納されているdataが32KB以上の場合に発生
 		// このエラーはDOS攻撃対策のためのエラー
-		if (tmpData.length === 90) {
+		if (tmpData.length === 80) {
 			// ガス設定したら100が限界
 			// 25はデータ登録されない
 			// 20はデータ登録される
 
 			// gas 0だと90いける
+			// あかんかったから80にした
 			await insert(token, tmpData)
 			tmpData.splice(0)
 		}
@@ -69,10 +70,10 @@ const insert = async (token: Contract, tmpData: any[]): Promise<void> => {
 	console.log(now)
 	const tx = await token.setNftData(args)
 	await tx.wait()
-	const owner = await token.ownerOf(last)
-	if (owner === ethers.constants.AddressZero) {
-		throw Error('data not found')
-	}
+	// Const owner = await token.ownerOf(last)
+	// if (owner === ethers.constants.AddressZero) {
+	// 	throw Error('data not found')
+	// }
 }
 
 main()
@@ -82,4 +83,4 @@ main()
 		process.exit(1)
 	})
 
-// Npx hardhat run dist/scripts/import-owners.js --network testPrivate
+// Npx hardhat run dist/scripts/import-owners.js --network private

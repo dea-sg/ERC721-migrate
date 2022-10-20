@@ -36,3 +36,6 @@ main()
 
 // proxy was deployed to: 0xB0071322dB5fcdA6DDA03aE456524C3E5E5D07A3
 // logic was deployed to: 0x788cc3634368696f8cc474353e821111b4bb8AbC
+
+// 本番
+// proxy was deployed to: 0xcCb3F56AA3e998ee6A662EA822DCd3238C002933
