@@ -8,8 +8,8 @@ import { abi } from '../artifacts/contracts/ERC721TokenUpgradable.sol/ERC721Toke
 
 async function main() {
 	/// /////////////////////////////////////////////////////
-	const contractAddress = '0xB0071322dB5fcdA6DDA03aE456524C3E5E5D07A3'
-	const minterAddress = '0x31ef290f34aadf560f686487099e63ab2fedb326'
+	const contractAddress = '0xcCb3F56AA3e998ee6A662EA822DCd3238C002933'
+	const minterAddress = '0xe1b73ac21f5e47e02e538a715ea76f5941b41d67'
 	/// /////////////////////////////////////////////////////
 	const account = await ethers.getSigners()
 	const token = new ethers.Contract(contractAddress, abi, account[0])
@@ -26,4 +26,4 @@ main()
 		process.exit(1)
 	})
 
-// Npx hardhat run dist/scripts/set-minter.js --network testPrivate
+// npx hardhat run dist/scripts/set-minter.js --network private
