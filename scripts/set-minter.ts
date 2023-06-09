@@ -26,4 +26,4 @@ main()
 		process.exit(1)
 	})
 
-// npx hardhat run dist/scripts/set-minter.js --network private
+// Npx hardhat run dist/scripts/set-minter.js --network private

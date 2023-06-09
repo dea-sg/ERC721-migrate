@@ -16,18 +16,6 @@ interface IERC721TokenUpgradable {
 		uint256 assetId;
 	}
 
-	function getTokenId(uint256 _index) external view returns (uint256);
-
-	function getTokenList(uint256 _start, uint256 _end)
-		external
-		view
-		returns (uint256[] memory tokenIdList);
-
-	function getOwnerTokenList(address _owner)
-		external
-		view
-		returns (uint256[] memory tokenIdList);
-
 	function getAssetData(uint256 _assetId)
 		external
 		view

@@ -3,6 +3,7 @@
 
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { Wallet } from 'ethers'
 import {
 	takeSnapshot,
@@ -30,6 +31,102 @@ describe('ERC721Token', () => {
 		expect(assetData.asset_name).to.equal('')
 		expect(assetData.uri).to.equal('')
 	}
+
+	describe('transferFrom', () => {
+		let user1: SignerWithAddress
+		let user2: SignerWithAddress
+		beforeEach(async () => {
+			const accounts = await ethers.getSigners()
+
+			user1 = accounts[1]
+			user2 = accounts[2]
+			await token.bulkMint(user1.address, 1, 'test name', 'test uri', 3)
+		})
+		it('if to address is 0, nft will be burn', async () => {
+			const beforeBalance1 = await token.balanceOf(user1.address)
+			expect(beforeBalance1).to.equal(3)
+			const beforeOwner100001 = await token.ownerOf(100001)
+			expect(beforeOwner100001).to.equal(user1.address)
+			const beforeOwner100002 = await token.ownerOf(100002)
+			expect(beforeOwner100002).to.equal(user1.address)
+			const beforeOwner100003 = await token.ownerOf(100003)
+			expect(beforeOwner100003).to.equal(user1.address)
+			const beforeBalance2 = await token.balanceOf(user2.address)
+			expect(beforeBalance2).to.equal(0)
+
+			const beforeTokenURI100001 = await token.tokenURI(100001)
+			expect(beforeTokenURI100001).to.equal('https://playmining.com/metadata/1')
+			const beforeTokenURI100002 = await token.tokenURI(100002)
+			expect(beforeTokenURI100002).to.equal('https://playmining.com/metadata/1')
+			const beforeTokenURI100003 = await token.tokenURI(100003)
+			expect(beforeTokenURI100003).to.equal('https://playmining.com/metadata/1')
+
+			await token
+				.connect(user1)
+				.transferFrom(user1.address, ethers.constants.AddressZero, 100002)
+
+			const afterBalance1 = await token.balanceOf(user1.address)
+			expect(afterBalance1).to.equal(2)
+			const afterOwner100001 = await token.ownerOf(100001)
+			expect(afterOwner100001).to.equal(user1.address)
+			const afterOwner100003 = await token.ownerOf(100003)
+			expect(afterOwner100003).to.equal(user1.address)
+			const afterBalance2 = await token.balanceOf(user2.address)
+			expect(afterBalance2).to.equal(0)
+			await expect(token.ownerOf(100002)).to.be.revertedWith(
+				'ERC721: invalid token ID'
+			)
+
+			const afterTokenURI100001 = await token.tokenURI(100001)
+			expect(afterTokenURI100001).to.equal('https://playmining.com/metadata/1')
+			await expect(token.tokenURI(100002)).to.be.revertedWith(
+				'ERC721: invalid token ID'
+			)
+			const afterTokenURI100003 = await token.tokenURI(100003)
+			expect(afterTokenURI100003).to.equal('https://playmining.com/metadata/1')
+		})
+		it('if to address is not 0, nft will be transfer', async () => {
+			const beforeBalance1 = await token.balanceOf(user1.address)
+			expect(beforeBalance1).to.equal(3)
+			const beforeOwner100001 = await token.ownerOf(100001)
+			expect(beforeOwner100001).to.equal(user1.address)
+			const beforeOwner100002 = await token.ownerOf(100002)
+			expect(beforeOwner100002).to.equal(user1.address)
+			const beforeOwner100003 = await token.ownerOf(100003)
+			expect(beforeOwner100003).to.equal(user1.address)
+			const beforeBalance2 = await token.balanceOf(user2.address)
+			expect(beforeBalance2).to.equal(0)
+
+			const beforeTokenURI100001 = await token.tokenURI(100001)
+			expect(beforeTokenURI100001).to.equal('https://playmining.com/metadata/1')
+			const beforeTokenURI100002 = await token.tokenURI(100002)
+			expect(beforeTokenURI100002).to.equal('https://playmining.com/metadata/1')
+			const beforeTokenURI100003 = await token.tokenURI(100003)
+			expect(beforeTokenURI100003).to.equal('https://playmining.com/metadata/1')
+
+			await token
+				.connect(user1)
+				.transferFrom(user1.address, user2.address, 100002)
+
+			const afterBalance1 = await token.balanceOf(user1.address)
+			expect(afterBalance1).to.equal(2)
+			const afterOwner100001 = await token.ownerOf(100001)
+			expect(afterOwner100001).to.equal(user1.address)
+			const afterOwner100003 = await token.ownerOf(100003)
+			expect(afterOwner100003).to.equal(user1.address)
+			const afterBalance2 = await token.balanceOf(user2.address)
+			expect(afterBalance2).to.equal(1)
+			const afterOwner100002 = await token.ownerOf(100002)
+			expect(afterOwner100002).to.equal(user2.address)
+
+			const afterTokenURI100001 = await token.tokenURI(100001)
+			expect(afterTokenURI100001).to.equal('https://playmining.com/metadata/1')
+			const afterTokenURI100002 = await token.tokenURI(100002)
+			expect(afterTokenURI100002).to.equal('https://playmining.com/metadata/1')
+			const afterTokenURI100003 = await token.tokenURI(100003)
+			expect(afterTokenURI100003).to.equal('https://playmining.com/metadata/1')
+		})
+	})
 
 	describe('name', () => {
 		it('check name', async () => {
@@ -104,19 +201,6 @@ describe('ERC721Token', () => {
 		})
 	})
 
-	describe('totalSupply', () => {
-		it('dfault is 0', async () => {
-			const result = await token.totalSupply()
-			expect(result).to.equal(0)
-		})
-		it('count mint NFT', async () => {
-			const user = Wallet.createRandom()
-			await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
-			const result = await token.totalSupply()
-			expect(result).to.equal(1)
-		})
-	})
-
 	describe('tokenURI', () => {
 		describe('success', () => {
 			it('get token uri', async () => {
@@ -135,101 +219,6 @@ describe('ERC721Token', () => {
 		})
 	})
 
-	describe('getTokenId', () => {
-		describe('success', () => {
-			it('get token id', async () => {
-				const user = Wallet.createRandom()
-				await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
-				const result = await token.getTokenId(0)
-				expect(result).to.equal(100001)
-			})
-		})
-		describe('fail', () => {
-			it('dfault is 0', async () => {
-				await expect(token.getTokenId(5)).to.be.revertedWith(
-					'index out of bounds'
-				)
-			})
-		})
-	})
-
-	describe('getTokenList', () => {
-		describe('success', () => {
-			it('1 minted', async () => {
-				const user = Wallet.createRandom()
-				await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
-				const tokens = await token.getTokenList(0, 0)
-				expect(tokens).to.deep.equal([100001])
-			})
-			it('many minted', async () => {
-				const user = Wallet.createRandom()
-				await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
-				await token.bulkMint(user.address, 2, 'test name', 'test uri', 3)
-				const tokens = await token.getTokenList(0, 3)
-				expect(tokens).to.deep.equal([100001, 200001, 200002, 200003])
-			})
-			it('many many minted', async () => {
-				const user = Wallet.createRandom()
-				await token.bulkMint(user.address, 1, 'test name', 'test uri', 3)
-				await token.bulkMint(user.address, 2, 'test name', 'test uri', 4)
-				await token.bulkMint(user.address, 1, 'test name', 'test uri', 2)
-				const tokens = await token.getTokenList(2, 7)
-				expect(tokens).to.deep.equal([
-					100003, 200001, 200002, 200003, 200004, 100004,
-				])
-			})
-		})
-		describe('fail', () => {
-			it('range error', async () => {
-				await expect(token.getTokenList(5, 3)).to.be.revertedWith(
-					'input range error'
-				)
-			})
-			it('end < totalSupply', async () => {
-				await expect(token.getTokenList(3, 5)).to.be.revertedWith(
-					'index out of bounds'
-				)
-			})
-		})
-	})
-
-	describe('getOwnerTokenList', () => {
-		describe('success', () => {
-			it('1 minted', async () => {
-				const user = Wallet.createRandom()
-				await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
-				const tokenIdList = await token.getOwnerTokenList(user.address)
-				expect(tokenIdList).to.deep.equal([100001])
-			})
-			it('many minted', async () => {
-				const user = Wallet.createRandom()
-				await token.bulkMint(user.address, 1, 'test name', 'test uri', 1)
-				await token.bulkMint(user.address, 2, 'test name', 'test uri', 3)
-				const tokenIdList = await token.getOwnerTokenList(user.address)
-				expect(tokenIdList).to.deep.equal([100001, 200001, 200002, 200003])
-			})
-			it('many many minted', async () => {
-				const user = Wallet.createRandom()
-				const user2 = Wallet.createRandom()
-				await token.bulkMint(user.address, 1, 'test name', 'test uri', 3)
-				await token.bulkMint(user2.address, 2, 'test name', 'test uri', 4)
-				await token.bulkMint(user.address, 3, 'test name', 'test uri', 2)
-				const user1Tokens = await token.getOwnerTokenList(user.address)
-				expect(user1Tokens).to.deep.equal([
-					100001, 100002, 100003, 300001, 300002,
-				])
-				const user2Tokens = await token.getOwnerTokenList(user2.address)
-				expect(user2Tokens).to.deep.equal([200001, 200002, 200003, 200004])
-			})
-		})
-		describe('fail', () => {
-			it('address zero', async () => {
-				await expect(
-					token.getOwnerTokenList(ethers.constants.AddressZero)
-				).to.be.revertedWith('address is zero address')
-			})
-		})
-	})
 	describe('getAssetData', () => {
 		it('not minted', async () => {
 			await checkDefaultAssetData(100001)
@@ -257,13 +246,9 @@ describe('ERC721Token', () => {
 		describe('success', () => {
 			it('mint NFT', async () => {
 				const user = Wallet.createRandom()
-				const beforeCount = await token.totalSupply()
-				expect(beforeCount).to.equal(0)
 				const beforeBalance = await token.balanceOf(user.address)
 				expect(beforeBalance).to.equal(0)
 				await token.bulkMint(user.address, 1, 'token-name', 'toke uri', 1)
-				const afterCount = await token.totalSupply()
-				expect(afterCount).to.equal(1)
 				const afterBalance = await token.balanceOf(user.address)
 				expect(afterBalance).to.equal(1)
 				const owner = await token.ownerOf(100001)
@@ -285,13 +270,9 @@ describe('ERC721Token', () => {
 			})
 			it('create many asset data', async () => {
 				const user = Wallet.createRandom()
-				const beforeCount = await token.totalSupply()
-				expect(beforeCount).to.equal(0)
 				const beforeBalance = await token.balanceOf(user.address)
 				expect(beforeBalance).to.equal(0)
 				await token.bulkMint(user.address, 1, 'token-name', 'toke uri', 3)
-				const afterCount = await token.totalSupply()
-				expect(afterCount).to.equal(3)
 				const afterBalance = await token.balanceOf(user.address)
 				expect(afterBalance).to.equal(3)
 				const owner1 = await token.ownerOf(100001)
@@ -313,6 +294,18 @@ describe('ERC721Token', () => {
 				const beforeAssetData = await token.getAssetData(1)
 				expect(beforeAssetData.total_number).to.equal(1)
 				await token.bulkMint(user.address, 1, 'token-name', 'toke uri', 3)
+				const afterAssetData = await token.getAssetData(1)
+				expect(afterAssetData.total_number).to.equal(4)
+			})
+			it('added total number2', async () => {
+				const accounts = await ethers.getSigners()
+				const user = accounts[1]
+				await token.bulkMint(user.address, 1, 'token-name', 'toke uri', 4)
+				const beforeAssetData = await token.getAssetData(1)
+				expect(beforeAssetData.total_number).to.equal(4)
+				await token
+					.connect(user)
+					.transferFrom(user.address, ethers.constants.AddressZero, 100002)
 				const afterAssetData = await token.getAssetData(1)
 				expect(afterAssetData.total_number).to.equal(4)
 			})
@@ -454,9 +447,6 @@ describe('ERC721Token', () => {
 				const beforeBalance4 = await token.balanceOf(user4.address)
 				expect(beforeBalance4).to.deep.equal(0)
 
-				const beforeTotalSupply = await token.totalSupply()
-				expect(beforeTotalSupply).to.deep.equal(0)
-
 				await token.setNftData([
 					{ tokenId: 1, owner: user1.address, assetId: 10 },
 					{ tokenId: 2, owner: user2.address, assetId: 20 },
@@ -492,18 +482,6 @@ describe('ERC721Token', () => {
 				expect(uri3).to.deep.equal('https://playmining.com/metadata/30')
 				const uri4 = await token.tokenURI(4)
 				expect(uri4).to.deep.equal('https://playmining.com/metadata/40')
-
-				const afterTotalSupply = await token.totalSupply()
-				expect(afterTotalSupply).to.deep.equal(4)
-
-				const tokenId1 = await token.getTokenId(0)
-				expect(tokenId1).to.deep.equal(1)
-				const tokenId2 = await token.getTokenId(1)
-				expect(tokenId2).to.deep.equal(2)
-				const tokenId3 = await token.getTokenId(2)
-				expect(tokenId3).to.deep.equal(3)
-				const tokenId4 = await token.getTokenId(3)
-				expect(tokenId4).to.deep.equal(4)
 			})
 		})
 		describe('fail', () => {

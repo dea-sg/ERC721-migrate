@@ -27,7 +27,7 @@ contract ERC721TokenUpgradable is
 	// solhint-disable-next-line var-name-mixedcase
 	mapping(uint256 => AssetData) public asset_info; //asset id => AssetData
 	//生成したトークンIDリスト
-	uint256[] private tokenList;
+	uint256[] private tokenList; // unuse、proxyパターンで記述しているため、削除できない
 
 	function initialize() public initializer {
 		__UUPSUpgradeable_init();
@@ -53,14 +53,6 @@ contract ERC721TokenUpgradable is
 			ERC721Upgradeable.supportsInterface(_interfaceId);
 	}
 
-	/**
-	 * @dev 生成したトークン総量を取得する
-	 * @return uint256
-	 */
-	function totalSupply() public view returns (uint256) {
-		return tokenList.length;
-	}
-
 	function tokenURI(uint256 _tokenId)
 		public
 		view
@@ -84,79 +76,17 @@ contract ERC721TokenUpgradable is
 		return "https://playmining.com/metadata/";
 	}
 
-	/**
-	 * @dev Gets the token ID at a given index of all the tokens in this contract
-	 * Reverts if the index is greater or equal to the total number of tokens.
-	 * @param _index uint256 representing the index to be accessed of the tokens list
-	 * @return uint256 token ID at the given index of the tokens list
-	 */
-	function getTokenId(uint256 _index) public view returns (uint256) {
-		require(_index < totalSupply(), "index out of bounds");
-		return tokenList[_index];
-	}
-
-	/**
-	 * @dev トークンidリストを取得する
-	 *      引数次第で全件検索が走るが、移行もとの関数そのままで一旦実装
-	 * @param _start uint256 start index
-	 * @param _end uint256 end index
-	 * @return tokenIdList uint256[] トークンidリスト
-	 */
-	function getTokenList(uint256 _start, uint256 _end)
-		public
-		view
-		returns (uint256[] memory tokenIdList)
-	{
-		uint256 totalSupply_ = totalSupply();
-		uint256 tokenId;
-		uint256 tokenIndex = 0;
-
-		require(_end >= _start, "input range error");
-		// どう考えても無理だが、残しておく
-		require(_start >= 0, "index out of bounds");
-		require(_end < totalSupply_, "index out of bounds");
-
-		uint256 dataLength = _end - _start + 1;
-
-		tokenIdList = new uint256[](dataLength);
-
-		for (uint256 index = _start; index <= _end; index++) {
-			tokenId = getTokenId(index);
-			tokenIdList[tokenIndex] = tokenId;
-			tokenIndex = tokenIndex + 1;
+	function _transfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) internal override {
+		if (to == address(0)) {
+			_burn(tokenId);
+			delete _tokenURIs[tokenId];
+			return;
 		}
-
-		return tokenIdList;
-	}
-
-	/**
-	 * @dev user addressによって、トークンidリストを取得する
-	 *      全件検索が走るが、移行もとの関数そのままで一旦実装
-	 * @param _owner address
-	 * @return tokenIdList uint256[] トークンidリスト
-	 */
-	function getOwnerTokenList(address _owner)
-		public
-		view
-		returns (uint256[] memory tokenIdList)
-	{
-		require(_owner != address(0), "address is zero address");
-		uint256 totalSupply_ = totalSupply();
-		uint256 userBalance = balanceOf(_owner);
-		uint256 tokenId;
-		uint256 tokenIndex = 0;
-
-		tokenIdList = new uint256[](userBalance);
-
-		for (uint256 index = 0; index < totalSupply_; index++) {
-			tokenId = getTokenId(index);
-			if (ownerOf(tokenId) == _owner) {
-				tokenIdList[tokenIndex] = tokenId;
-				tokenIndex = tokenIndex + 1;
-			}
-		}
-
-		return tokenIdList;
+		super._transfer(from, to, tokenId);
 	}
 
 	/**
@@ -280,10 +210,6 @@ contract ERC721TokenUpgradable is
 			//creat token id
 			tokenId = (_assetId * ASSET_ID_CARDINAL_NUMBER) + currentSerialId;
 
-			//トークン生成情報を記録する
-			//recore the structure of token id
-			tokenList.push(tokenId);
-
 			//トークンを配布する
 			//transfer token
 			mintWithTokenURI(_user, tokenId, _assetId);
@@ -348,7 +274,6 @@ contract ERC721TokenUpgradable is
 			TokenOwner memory tmp = _tokenOwners[index];
 			_mint(tmp.owner, tmp.tokenId);
 			_tokenURIs[tmp.tokenId] = tmp.assetId.toString();
-			tokenList.push(tmp.tokenId);
 		}
 	}
 }
