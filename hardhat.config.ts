@@ -11,7 +11,7 @@ const privateKey =
 		: process.env.PRIVATE_KEY
 
 const privateNetworkUrl =
-	process.env.PRIVATE_NETWORK_URL === 'undefined'
+	typeof process.env.PRIVATE_NETWORK_URL === 'undefined'
 		? 'https://hogehoge'
 		: process.env.PRIVATE_NETWORK_URL
 
