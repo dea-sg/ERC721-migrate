@@ -968,10 +968,10 @@
     lodash "^4.17.15"
     ts-essentials "^7.0.1"
 
-"@typechain/hardhat@6.1.3":
-  version "6.1.3"
-  resolved "https://registry.yarnpkg.com/@typechain/hardhat/-/hardhat-6.1.3.tgz#e6121502eb64903ab562d89e094a5506e7b86822"
-  integrity sha512-e1H9MVl286ma0HuD9CBL248+pbdA7lWF6+I7FYwzykIrjilKhvLUv0Q7LtcyZztzgbP2g4Tyg1UPE+xy+qR7cA==
+"@typechain/hardhat@6.1.6":
+  version "6.1.6"
+  resolved "https://registry.yarnpkg.com/@typechain/hardhat/-/hardhat-6.1.6.tgz#1a749eb35e5054c80df531cf440819cb347c62ea"
+  integrity sha512-BiVnegSs+ZHVymyidtK472syodx1sXYlYJJixZfRstHVGYTi8V1O7QG4nsjyb0PC/LORcq7sfBUcHto1y6UgJA==
   dependencies:
     fs-extra "^9.1.0"
 
