@@ -40,7 +40,7 @@
 		"del-cli": "5.0.0",
 		"dotenv": "16.1.4",
 		"eslint": "8.42.0",
-		"eslint-config-prettier": "8.5.0",
+		"eslint-config-prettier": "8.8.0",
 		"eslint-config-xo": "0.41.0",
 		"eslint-config-xo-typescript": "0.52.0",
 		"ethers": "5.6.9",
