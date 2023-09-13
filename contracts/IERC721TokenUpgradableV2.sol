@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.16;
 
-interface IERC721TokenUpgradable {
+interface IERC721TokenUpgradableV2 {
 	struct AssetData {
 		//紐づけシリアル総量
 		//the total number of serial ids in this asset id
@@ -16,7 +16,9 @@ interface IERC721TokenUpgradable {
 		uint256 assetId;
 	}
 
-	function getAssetData(uint256 _assetId)
+	function getAssetData(
+		uint256 _assetId
+	)
 		external
 		view
 		returns (

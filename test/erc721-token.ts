@@ -9,14 +9,14 @@ import {
 	takeSnapshot,
 	SnapshotRestorer,
 } from '@nomicfoundation/hardhat-network-helpers'
-import { ERC721TokenUpgradable, InterfaceIdTest } from '../typechain-types'
+import { ERC721TokenUpgradableV2, InterfaceIdTest } from '../typechain-types'
 
 describe('ERC721Token', () => {
-	let token: ERC721TokenUpgradable
+	let token: ERC721TokenUpgradableV2
 	let snapshot: SnapshotRestorer
 	before(async () => {
-		const factory = await ethers.getContractFactory('ERC721TokenUpgradable')
-		token = (await factory.deploy()) as ERC721TokenUpgradable
+		const factory = await ethers.getContractFactory('ERC721TokenUpgradableV2')
+		token = (await factory.deploy()) as ERC721TokenUpgradableV2
 		await token.deployed()
 		await token.initialize()
 		snapshot = await takeSnapshot()
@@ -173,8 +173,8 @@ describe('ERC721Token', () => {
 			interfaceIdTest = (await factory.deploy()) as InterfaceIdTest
 			await interfaceIdTest.deployed()
 		})
-		it('ERC721TokenUpgradable', async () => {
-			const interfaceId = await interfaceIdTest.getERC721TokenUpgradableId()
+		it('ERC721TokenUpgradableV2', async () => {
+			const interfaceId = await interfaceIdTest.getERC721TokenUpgradableV2Id()
 			const result = await token.supportsInterface(interfaceId)
 			expect(result).to.equal(true)
 		})

@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { ethers } from 'hardhat'
-import { abi } from '../artifacts/contracts/ERC721TokenUpgradable.sol/ERC721TokenUpgradable.json'
+import { abi } from '../artifacts/contracts/ERC721TokenUpgradableV2.sol/ERC721TokenUpgradableV2.json'
 
 async function main() {
 	/// /////////////////////////////////////////////////////
