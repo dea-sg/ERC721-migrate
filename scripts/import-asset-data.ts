@@ -6,7 +6,7 @@
 
 import { ethers } from 'hardhat'
 import { Contract } from 'ethers'
-import { abi } from './../artifacts/contracts/ERC721TokenUpgradable.sol/ERC721TokenUpgradable.json'
+import { abi } from './../artifacts/contracts/ERC721TokenUpgradableV2.sol/ERC721TokenUpgradableV2.json'
 import csv from 'csvtojson'
 
 async function main() {
