@@ -54,7 +54,7 @@
 		"solidity-coverage": "0.8.11",
 		"ts-node": "10.9.2",
 		"typechain": "8.3.2",
-		"typescript": "5.1.6",
+		"typescript": "5.5.2",
 		"csv-writer": "1.6.0"
 	},
 	"dependencies": {
