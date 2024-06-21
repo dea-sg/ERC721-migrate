@@ -47,7 +47,7 @@
 		"hardhat": "2.19.5",
 		"hardhat-gas-reporter": "1.0.10",
 		"husky": "8.0.3",
-		"mocha": "10.2.0",
+		"mocha": "10.4.0",
 		"prettier": "2.8.8",
 		"prettier-plugin-solidity": "1.2.0",
 		"solhint": "3.4.1",
